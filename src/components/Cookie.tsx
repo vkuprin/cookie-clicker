@@ -5,7 +5,7 @@ type Props = {
 }
 
 const Cookie: React.FC<Props> = ({ onClick }) => (
-    <div onClick={onClick} className="cookie cursor-pointer text-9xl p-10 animate-spin select-none">
+    <div onClick={onClick} className="cookie cursor-pointer text-9xl p-10 select-none">
         🍪
     </div>
 );

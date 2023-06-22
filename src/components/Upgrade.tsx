@@ -12,7 +12,7 @@ type Props = {
 }
 
 const Upgrade: React.FC<Props> = ({ upgrade, onBuy }) => (
-    <div className="upgrade border-4 border-dashed border-white p-4 my-10 rounded shadow-lg">
+    <div className="upgrade  p-4 my-10 rounded shadow-lg">
         <h2 className="text-xl mb-2">{upgrade.name}</h2>
         <p className="mb-1">Cost: {upgrade.cost} cookies</p>
         <p className="mb-2">Effect: Increases cookie production by {upgrade.effect}</p>

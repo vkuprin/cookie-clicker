@@ -12,7 +12,7 @@ type Props = {
 }
 
 const Building: React.FC<Props> = ({ building, onBuy }) => (
-    <div className="building border-4 border-dashed border-white p-4 my-2 rounded shadow-lg">
+    <div className="building  p-4 my-2 rounded shadow-lg">
         <h2 className="text-xl mb-2">{building.type}</h2>
         <p className="mb-1">Cost: {building.cost} cookies</p>
         <p className="mb-2">Owned: {building.count}</p>
