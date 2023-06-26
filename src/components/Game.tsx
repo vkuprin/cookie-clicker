@@ -94,6 +94,27 @@ const Game = () => {
         }));
     }, [cookies]);
 
+
+    const calculateCookiesPerSecond = () => {
+        let totalCPS = 0;
+        buildings.forEach((building) => {
+            totalCPS += building.cps * building.count;
+        });
+        return totalCPS;
+    };
+
+    const incrementCookiesPerSecond = () => {
+        setCookies(cookies => cookies + calculateCookiesPerSecond());
+    };
+
+    useEffect(() => {
+        const timerID = setInterval(incrementCookiesPerSecond, 1000)
+
+        return () => {
+            clearInterval(timerID);
+        }
+    }, [buildings])
+
     return (
         <div className="game p-4">
             <h1 className="text-2xl mb-4">Cookies: {cookies.toFixed(1)}</h1>
