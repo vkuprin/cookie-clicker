@@ -9,20 +9,21 @@ type BuildingType = {
   type: string;
   cost: number;
   count: number;
-  cps: number; // cookies per second
+  cps: number;
 };
 
 type UpgradeType = {
   name: string;
   cost: number;
   effect: number;
-  target: string; // can be 'click' or building type
+  target: string;
 };
 
 type AchievementType = {
   name: string;
   description: string;
-  condition: () => boolean; // a function to check if achievement is unlocked
+  condition: () => boolean;
+  unlocked?: boolean;
 };
 
 const Game = () => {
@@ -37,20 +38,16 @@ const Game = () => {
 
   const [upgrades, setUpgrades] = useState<UpgradeType[]>([
     { name: "Reinforced index finger", cost: 100, effect: 2, target: "click" },
-    {
-      name: "Steel-plated rolling pins",
-      cost: 500,
-      effect: 2,
-      target: "Grandma",
-    },
+    { name: "Steel-plated rolling pins", cost: 500, effect: 2, target: "Grandma" },
     { name: "Fertilizer", cost: 2500, effect: 2, target: "Farm" },
   ]);
 
-  const [achievements, setAchievements] = useState<AchievementType[]>([
+  const [achievements, setAchievements] = useState<(AchievementType & { unlocked: boolean })[]>([
     {
       name: "Wake and bake",
       description: "Bake 1 cookie in one ascension.",
       condition: () => cookies >= 1,
+      unlocked: false
     },
   ]);
 
@@ -83,25 +80,28 @@ const Game = () => {
         setClickPower((clickPower) => clickPower * upgrade.effect);
       } else {
         setBuildings((buildings) =>
-          buildings.map((b) => {
-            if (b.type === upgrade.target) {
-              return { ...b, cps: b.cps * upgrade.effect };
-            }
-            return b;
-          }),
+            buildings.map((b) => {
+              if (b.type === upgrade.target) {
+                return { ...b, cps: b.cps * upgrade.effect };
+              }
+              return b;
+            }),
         );
       }
     }
   };
 
   useEffect(() => {
-    setAchievements(
-      achievements.map((a) => {
-        if (!a.condition()) return a;
-        return { ...a, condition: () => true }; // mark as unlocked
-      }),
+    setAchievements((prevAchievements) =>
+        prevAchievements.map((achievement) => {
+          if (achievement.unlocked) return achievement;
+          return {
+            ...achievement,
+            unlocked: achievement.condition()
+          };
+        })
     );
-  }, [achievements, cookies]);
+  }, [cookies]);
 
   const calculateCookiesPerSecond = useCallback(() => {
     let totalCPS = 0;
@@ -117,41 +117,38 @@ const Game = () => {
 
   useEffect(() => {
     const timerID = setInterval(incrementCookiesPerSecond, 1000);
-
-    return () => {
-      clearInterval(timerID);
-    };
-  }, [buildings, incrementCookiesPerSecond]);
+    return () => clearInterval(timerID);
+  }, [incrementCookiesPerSecond]);
 
   return (
-    <div className="game p-4">
-      <h1 className="text-2xl mb-4">Cookies: {cookies.toFixed(1)}</h1>
-      <Cookie onClick={handleClick} />
-      {buildings.map((building, i) => (
-        <Building
-          key={building.type}
-          building={building}
-          onBuy={() => handleBuyBuilding(building, i)}
-        />
-      ))}
-      {upgrades.map((upgrade, i) => (
-        <Upgrade
-          key={upgrade.name}
-          upgrade={upgrade}
-          onBuy={() => handleBuyUpgrade(upgrade, i)}
-        />
-      ))}
-      {achievements.map((achievement, i) => (
-        <Achievement
-          key={achievement.name}
-          achievement={{
-            name: achievement.name,
-            description: achievement.description,
-            unlocked: achievement.condition(),
-          }}
-        />
-      ))}
-    </div>
+      <div className="game p-4">
+        <h1 className="text-2xl mb-4">Cookies: {cookies.toFixed(1)}</h1>
+        <Cookie onClick={handleClick} />
+        {buildings.map((building, i) => (
+            <Building
+                key={building.type}
+                building={building}
+                onBuy={() => handleBuyBuilding(building, i)}
+            />
+        ))}
+        {upgrades.map((upgrade, i) => (
+            <Upgrade
+                key={upgrade.name}
+                upgrade={upgrade}
+                onBuy={() => handleBuyUpgrade(upgrade, i)}
+            />
+        ))}
+        {achievements.map((achievement) => (
+            <Achievement
+                key={achievement.name}
+                achievement={{
+                  name: achievement.name,
+                  description: achievement.description,
+                  unlocked: achievement.unlocked
+                }}
+            />
+        ))}
+      </div>
   );
 };
 
