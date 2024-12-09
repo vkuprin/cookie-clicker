@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import {useState, useEffect, useCallback} from "react";
 import Cookie from "./Cookie";
 import Building from "./Building";
 import Upgrade from "./Upgrade";
@@ -103,17 +103,17 @@ const Game = () => {
     );
   }, [achievements, cookies]);
 
-  const calculateCookiesPerSecond = () => {
+  const calculateCookiesPerSecond = useCallback(() => {
     let totalCPS = 0;
     buildings.forEach((building) => {
       totalCPS += building.cps * building.count;
     });
     return totalCPS;
-  };
+  }, [buildings]);
 
-  const incrementCookiesPerSecond = () => {
+  const incrementCookiesPerSecond = useCallback(() => {
     setCookies((cookies) => cookies + calculateCookiesPerSecond());
-  };
+  }, [calculateCookiesPerSecond]);
 
   useEffect(() => {
     const timerID = setInterval(incrementCookiesPerSecond, 1000);
